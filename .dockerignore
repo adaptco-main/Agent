@@ -1,0 +1,3 @@
+# Exclude local environment secret files from image context
+.env
+.env.*
