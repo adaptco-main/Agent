@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-mesh-mcp"
+version = "0.1.0"
+description = "Agent Mesh MCP"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra"
+testpaths = ["tests"]

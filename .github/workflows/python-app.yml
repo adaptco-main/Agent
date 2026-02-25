@@ -1,0 +1,12 @@
+name: Python Application
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    uses: ./.github/workflows/python-reusable-ci.yml
+    with:
+      python-version: "3.11"
