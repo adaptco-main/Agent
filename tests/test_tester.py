@@ -1,9 +1,13 @@
+import re
 import warnings
 
 import pytest
 
 from agents.tester import run_tester_flow
-from orchestrator.llm_util import call_llm
+from orchestrator.llm_util import (
+    PROMPT_INTENT_DEPRECATION_MESSAGE,
+    call_llm,
+)
 
 
 def test_tester_flow_accepts_expected_payload():
@@ -26,7 +30,6 @@ def test_tester_flow_accepts_expected_payload():
     ],
 )
 def test_tester_flow_rejects_malformed_payload(payload, message):
-    import re
     with pytest.raises(ValueError, match=re.escape(message)):
         run_tester_flow(payload)
 
@@ -38,6 +41,7 @@ def test_call_llm_backward_compatibility_emits_deprecation_warning():
 
     assert result["prompt"] == "legacy prompt"
     assert any(issubclass(w.category, DeprecationWarning) for w in caught)
+    assert any(PROMPT_INTENT_DEPRECATION_MESSAGE in str(w.message) for w in caught)
 
 
 @pytest.mark.parametrize(
@@ -52,6 +56,10 @@ def test_call_llm_backward_compatibility_emits_deprecation_warning():
     ],
 )
 def test_call_llm_rejects_invalid_argument_shapes(kwargs, message):
-    import re
     with pytest.raises(ValueError, match=re.escape(message)):
         call_llm(**kwargs)
+
+
+def test_call_llm_rejects_non_string_llm_response():
+    with pytest.raises(ValueError, match=re.escape("LLM client must return a string response.")):
+        call_llm(prompt="health check", llm_client=lambda _: 123)

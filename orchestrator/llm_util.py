@@ -7,6 +7,11 @@ from typing import Any, Callable, Dict, Optional
 
 
 LLMCallable = Callable[[str], str]
+PROMPT_INTENT_DEPRECATION_VERSION = "2.0"
+PROMPT_INTENT_DEPRECATION_MESSAGE = (
+    "`prompt_intent` is deprecated and will be removed in "
+    f"{PROMPT_INTENT_DEPRECATION_VERSION}; use `prompt`."
+)
 
 
 def call_llm(
@@ -17,8 +22,10 @@ def call_llm(
 ) -> Dict[str, Any]:
     """Call the configured LLM and return a normalized payload.
 
-    `prompt_intent` is deprecated and will be removed in a future release.
-    Use `prompt` instead.
+    Deprecation path for ``prompt_intent``:
+    - Supported for backward compatibility in current releases.
+    - Emits ``DeprecationWarning`` on use.
+    - Planned removal in version 2.0.
     """
 
     if prompt is not None and prompt_intent is not None:
@@ -28,8 +35,7 @@ def call_llm(
         if prompt_intent is None:
             raise ValueError("`prompt` is required.")
         warnings.warn(
-            "`prompt_intent` is deprecated and will be removed in a future release; "
-            "use `prompt`.",
+            PROMPT_INTENT_DEPRECATION_MESSAGE,
             DeprecationWarning,
             stacklevel=2,
         )
