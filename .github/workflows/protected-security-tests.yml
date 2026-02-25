@@ -1,0 +1,23 @@
+name: protected-security-tests
+
+on:
+  pull_request:
+    branches: ["main", "master"]
+  push:
+    branches: ["main", "master"]
+
+jobs:
+  security-critical-tests:
+    name: security-critical-tests (required)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pytest
+        run: python -m pip install --upgrade pip pytest
+      - name: Guard against disabled protected suites
+        run: python scripts/ci/check_no_fully_commented_tests.py
+      - name: Run protected security test suites
+        run: pytest -q tests/test_mcp_tooling_security.py tests/test_oidc_validation.py
