@@ -1,20 +1,21 @@
-from fastapi import Depends, FastAPI
+"""Application entrypoint."""
 
-from auth.security import require_bearer
+from __future__ import annotations
+
+from typing import Any
+
+from orchestrator.webhook import router as webhook_router
+
+try:  # pragma: no cover - exercised where fastapi is installed
+    from fastapi import FastAPI
+except Exception:  # pragma: no cover - fallback for minimal environments
+    class FastAPI:  # type: ignore[override]
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            self.routers: list[Any] = []
+
+        def include_router(self, router: Any) -> None:
+            self.routers.append(router)
+
 
 app = FastAPI(title="orchestrator")
-
-
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
-
-
-@app.post("/orchestrate", dependencies=[Depends(require_bearer)])
-def orchestrate() -> dict[str, str]:
-    return {"status": "started"}
-
-
-@app.get("/plans/{plan_id}", dependencies=[Depends(require_bearer)])
-def get_plan(plan_id: str) -> dict[str, str]:
-    return {"plan_id": plan_id, "status": "ready"}
+app.include_router(webhook_router)
